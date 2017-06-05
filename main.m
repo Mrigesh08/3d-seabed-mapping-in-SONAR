@@ -22,12 +22,11 @@ load('NIOT_DATA.mat');
 
 % ############ Extract Useful data ###################
 actualData=zeros(46080,numberOfPings);
-k=1;
+k=1;i=1;
 for j=1:1536
-    actualData(j*32+k-1:j*32+k+32-1-1,:)=seatrial_Data(32+j*32+k-1:32+j*32+k+32-1-1-1,:);
-    k=k+32;
+    actualData((j-1)*30+i:(j-1)*30+i+30-1,:)=seatrial_data((j-1)*32+k+32:(j-1)*32+k+32-1-1-1+32,:);
 end
-actualData=seatrial_data(32:49183,:);
+
 % ############ Extract Useful data ends ##############
 
 % ########### Normalization ##########################
@@ -47,11 +46,16 @@ actualData=actualData./maxOfData;
 % ########### Normalization Ends #####################
 
 % ########### Check if Along Map and across Map data. ######
-summedData=zeros(1536,numberOfPings);
-for i=1:m
-    j=1;
+summedData=zeros(1536,n);
+for i=1:n
     for t=1:1536
-        summedData=sum
-       j=j+32;
+        summedData(t,i)=sum(actualData((t-1)*30+1:(t-1)*30+30,i));
     end
 end
+
+
+% ############# Taking the transform #################
+finalMat=transform_g(summedData,n);
+finalMat=ind2rgb(finalMat(:,:),jet(256));
+figure(1)
+imshow(finalMat,[])
