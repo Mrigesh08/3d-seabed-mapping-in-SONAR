@@ -7,10 +7,15 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 from matplotlib.backend_bases import key_press_handler
 from tkinter import *
 from matplotlib.figure import Figure
-
+from tkinter.filedialog import askopenfilename
 
 mat = scipy.io.loadmat('./finalMat.mat')
 data = mat['finalMat']
+depths=[0 for x in range(193)]
+data2 = [[0 for x in range(192)] for y in range(1536)]
+for x in range(0,192):
+	for y in range(0,1536):
+		data2[y][x]=abs(data[y][x])
 
 #print (data[:,:])
 def init(self):
@@ -28,6 +33,50 @@ def init(self):
     cax.set_frame_on(False)
     plt.colorbar(orientation='vertical')
     plt.show()
+
+def selectFileData():
+    global filename
+    filename=askopenfilename()
+    print(filename)
+    #Label(ctr_right,text=filename,width=15).grid(column=1, row=5)
+    entry_B.insert(END,filename)
+
+def selectFileChirpData():
+    global filename2
+    filename2=askopenfilename()
+    print(filename2)
+    #Label(ctr_right,text=filename,width=15).grid(column=1, row=5)
+    entry_C.insert(END,filename2)
+
+def getDepths(self):
+	i=0
+	for y in range(0,192):
+		runningAverage=0
+		runningAverage=0
+		baseDifference=0
+		for x in range(600,1500,10):
+			for z in range(x,x+10):
+				runningAverage=(data2[z][y])/(z-x+1) + runningAverage*((z-x)/(z-x+1))
+			if runningAverage<200:
+				#print("running average")
+				#print(runningAverage)
+				#print("depth")
+				#print(x)
+				depths[i]=x/133
+				i=i+1
+				break
+		
+		#print("running average 2")
+		#print(runningAverage)
+		#print(runningAverage2*1000000000000)
+		#print(runningAverage2*1000000000000-runningAverage*1000000000000)
+		#runningAverage=(runningAverage+runningAverage2)/2;
+	
+		#print("y break")
+		#print(y)
+		#print(" ")
+	print(depths)	
+			
 ########################################################################
 root = Tk()
 root.title('2D image generation for SONAR data')
@@ -65,10 +114,13 @@ width_label = Label(ctr_right,background='white', text = 'Rows: ',borderwidth = 
 length_label = Label(ctr_right,background='white', text = 'Columns:')
 height_label = Label(ctr_right,background='white', text = 'Start Point:')
 button_b1=Button(ctr_right,text="Generate Plot")
+button_b2=Button(ctr_right,text="Browse SONAR File", command=selectFileData)
+button_b3=Button(ctr_right,text="Browse Chirp File", command=selectFileChirpData)
 entry_W = Entry(ctr_right, background="white")
 entry_L = Entry(ctr_right, background="white")
 entry_H = Entry(ctr_right, background="white")
-
+entry_B = Entry(ctr_right, background="white")
+entry_C = Entry(ctr_right,background="white")
 # use e.get() to get the string.
 #use int(e.get())to convert to int
 # use button_b1.bind('<BUTTON-1>',functionName)
@@ -79,10 +131,13 @@ width_label.grid(row = 1, column = 0,padx=10, pady=10)
 length_label.grid(row = 2, column = 0,padx=10, pady=10)
 height_label.grid(row = 3, column = 0,padx=10, pady=10)
 button_b1.grid(row = 4, column=0,padx=10, pady=10)
+button_b2.grid(row=5,column=0,padx=10,pady=10)
+button_b3.grid(row=5,column=1,padx=10,pady=10)
 entry_W.grid(row = 1, column = 1)
 entry_L.grid(row = 2, column = 1)
 entry_H.grid(row = 3, column = 1)
-
+entry_B.grid(row=8,column=0)
+entry_C.grid(row=9,column=0)
 #############################################################################
 def init2(self):
     f=Figure(figsize=(4,6),dpi=100)
@@ -98,5 +153,5 @@ def init2(self):
     canvas.get_tk_widget().pack(side=TOP,fill=BOTH,expand=1)
 #############################################################################
 ##############################################################################
-button_b1.bind('<Button-1>',init)
+button_b1.bind('<Button-1>',getDepths)
 root.mainloop()
