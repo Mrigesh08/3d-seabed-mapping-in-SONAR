@@ -1,8 +1,12 @@
+import random
 import matplotlib
 matplotlib.use('TkAgg')
 import scipy.io
 import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 from matplotlib.backend_bases import key_press_handler
 from tkinter import *
@@ -16,7 +20,7 @@ data2 = [[0 for x in range(192)] for y in range(1536)]
 for x in range(0,192):
 	for y in range(0,1536):
 		data2[y][x]=abs(data[y][x])
-
+global depthsArr
 #print (data[:,:])
 def init(self):
     fig = plt.figure(figsize=(6, 10))
@@ -48,6 +52,41 @@ def selectFileChirpData():
     #Label(ctr_right,text=filename,width=15).grid(column=1, row=5)
     entry_C.insert(END,filename2)
 
+def interpolate(arr2):
+	global depthsArr
+	n = 20;
+	depthsArr = np.zeros((n,192));
+	for x in range(0,192):
+		if arr2[x]>7:
+			depthsArr[0,x]=arr2[x]
+		else:
+			depthsArr[0,x]=7
+
+	for i in range(1,n):
+	    for j in range(0,192):
+	        rand = random.randint(-10,11)
+	        depthsArr[i,j] = depthsArr[0,j] + (rand/50)
+
+	print (depthsArr)
+	return depthsArr
+
+def plot3d():
+	global depthsArr
+	fig=plt.figure()
+	ax=fig.gca(projection='3d')
+	X=np.arange(0,1920,10)
+	print(X)
+	Y=np.arange(0,200,10)
+	print(Y)
+	X, Y = np.meshgrid(X, Y)
+	Z=depthsArr
+	surf=ax.plot_surface(X,Y,Z, cmap=cm.Blues, rstride=10,cstride=10,linewidth=0, antialiased=False)
+	ax.set_zlim(0, 8)
+	ax.zaxis.set_major_locator(LinearLocator(10))
+	ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+	fig.colorbar(surf, shrink=0.5, aspect=10)
+	plt.show()
+
 def getDepths(self):
 	i=0
 	for y in range(0,192):
@@ -75,8 +114,36 @@ def getDepths(self):
 		#print("y break")
 		#print(y)
 		#print(" ")
-	print(depths)	
-			
+	#print(depths)
+	interpolate(depths)	
+	plot3d()
+
+def plot3d2():
+	fig = plt.figure()
+	ax = fig.gca(projection='3d')
+
+	# Make data.
+	X = np.arange(-5, 5, 0.25)
+	Y = np.arange(-5, 5, 0.25)
+	X, Y = np.meshgrid(X, Y)
+	R = np.sqrt(X**2 + Y**2)
+	Z = np.sin(R)
+	print(" Z ")
+	print(Z)
+	print(len(Z[0,:]))
+	# Plot the surface.
+	surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
+	                       linewidth=0, antialiased=False)
+
+	# Customize the z axis.
+	ax.set_zlim(-1.01, 1.01)
+	ax.zaxis.set_major_locator(LinearLocator(10))
+	ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+
+	# Add a color bar which maps values to colors.
+	fig.colorbar(surf, shrink=0.5, aspect=5)
+
+	plt.show()
 ########################################################################
 root = Tk()
 root.title('2D image generation for SONAR data')
