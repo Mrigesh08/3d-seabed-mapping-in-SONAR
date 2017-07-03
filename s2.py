@@ -24,7 +24,7 @@ py.offline.init_notebook_mode()
 
 ###########################################################################################
 
-depths=[0 for x in range(193)]
+depths=[0 for x in range(192)]
 #data2 = [[0 for x in range(192)] for y in range(1536)]
 #for x in range(0,192):
 #	for y in range(0,1536):
@@ -247,27 +247,27 @@ def getDepths():
 	#print(depths)
 	return depths
 
-def simple2dPlot(self):
+def simple2dPlot():
 	generate2DPlot()
 	plot2d()
 
-def Plot2DwithMetalPlate(self):
+def plot2DwithMetalPlate():
 	generate2DPlot()
 	insertMetalPlate()
 	plot2d()
 
-def simple3dPlot(self):	
+def simple3dPlot():	
 	generate2DPlot()
 	interpolate(getDepths())	
 	plot3dByPlotly()
 
-def plot3dWithMetalStrip(self):
+def plot3dWithMetalStrip():
 	generate2DPlot()
 	insertMetalPlate()
 	interpolate(getDepths())	
 	plot3dByPlotly()
 
-def plot3dWithObject(self):
+def plot3dWithObject():
 	generate2DPlot()
 	interpolateAndCreateObject(getDepths())	
 	plot3dByPlotly()
@@ -275,19 +275,20 @@ def plot3dWithObject(self):
 ########################################################################
 root = Tk()
 root.title('2D image generation for SONAR data')
-root.geometry('{}x{}'.format(800, 600))
+root.geometry('{}x{}'.format(400, 500))
 
 # create all of the main containers
-top_frame = Frame(root, bg='white', width = 450, height=50, pady=10, padx=10, marginx=100)
-center = Frame(root, bg='#ddd', width=450, height=190, padx=3, pady=3)
+top_frame_container = Frame(root, bg='#ddd', width = 200, height=90, pady=5, padx=5)
+top_frame = Frame(top_frame_container, bg='white', width = 300, height=50,padx=32,pady=10)
+center = Frame(root, bg='#ddd', width=200, height=190, padx=5, pady=5)
 #btm_frame = Frame(root, bg='white', width = 450, height = 45, pady=3)
 #btm_frame2 = Frame(root, bg='lavender', width = 450, height = 60, pady=3)
 
 # layout all of the main containers
 root.grid_rowconfigure(1, weight=1)
 root.grid_columnconfigure(0, weight=1)
-
-top_frame.grid(row=0, sticky="ew")
+top_frame_container.grid(sticky="ew")
+top_frame.grid(row=1, sticky="nsew")
 center.grid(row=1, sticky="nsew")
 #btm_frame.grid(row = 3, sticky="ew")
 #btm_frame2.grid(row = 4, sticky="ew")
@@ -296,28 +297,32 @@ center.grid(row=1, sticky="nsew")
 top_frame.grid_rowconfigure(1,weight=1)
 top_frame.grid_columnconfigure(1,weight=1)
 center.grid_rowconfigure(0, weight=1)
-center.grid_columnconfigure(1, weight=1)
+center.grid_columnconfigure(0, weight=1)
 
 # ctr_left = Frame(center, bg='blue', width=100, height=190)
-ctr_mid = Frame(center, bg='white', width=525, height=190, padx=10, pady=3)
-ctr_right = Frame(center, bg='white', width=90, height=190, padx=10, pady=3)
+#ctr_mid = Frame(center, bg='white', width=525, height=190, padx=10, pady=3)
+ctr_right = Frame(center, bg='white', width=200, height=190, padx=10, pady=3)
 
 # ctr_left.grid(row=0, column = 0, sticky="ns")
-ctr_mid.grid(row=0, column = 1, sticky="ns")
-ctr_right.grid(row=0, column = 2, sticky="ns")
+#ctr_mid.grid(row=0, column = 1, sticky="ns")
+ctr_right.grid(sticky="nsew")
 # create the widgets for the top frame
 #model_label = Label(top_frame, text = 'Model Dimensions')
 width_label = Label(ctr_right,background='white', text = 'Rows: ',borderwidth = 5)
 length_label = Label(ctr_right,background='white', text = 'Columns:')
 height_label = Label(ctr_right,background='white', text = 'Start Point:')
-button_b1=Button(ctr_right,text="Generate Plot")
-button_b2=Button(top_frame,text="Browse SONAR File", command=selectFileData)
-button_b3=Button(top_frame,text="Browse Chirp File", command=selectFileChirpData)
+button_b1=Button(ctr_right,text="Generate 2D plot",width=25, command=simple2dPlot)
+button_b2=Button(top_frame,text="Browse SONAR File",width=16, command=selectFileData)
+button_b3=Button(top_frame,text="Browse Chirp File",width=16 , command=selectFileChirpData)
+button_b4=Button(ctr_right,text="Generate 2D plot with Metal Strip",width=25 , command=plot2DwithMetalPlate)
+button_b5=Button(ctr_right,text="Generate 3D plot",width=25 , command=simple3dPlot)
+button_b6=Button(ctr_right,text="Generate 3D plot with Metal Strip",width=25 , command=plot3dWithMetalStrip)
+button_b7=Button(ctr_right,text="Generate 3D plot with Object",width=25 , command=plot3dWithObject)
 entry_W = Entry(ctr_right, background="white")
 entry_L = Entry(ctr_right, background="white")
 entry_H = Entry(ctr_right, background="white")
-entry_B = Entry(top_frame, background="white")
-entry_C = Entry(top_frame,background="white")
+entry_B = Entry(top_frame,width=30 , background="white")
+entry_C = Entry(top_frame,width=30 ,background="white")
 # use e.get() to get the string.
 #use int(e.get())to convert to int
 # use button_b1.bind('<BUTTON-1>',functionName)
@@ -328,8 +333,12 @@ width_label.grid(row = 1, column = 0,padx=10, pady=10)
 length_label.grid(row = 2, column = 0,padx=10, pady=10)
 height_label.grid(row = 3, column = 0,padx=10, pady=10)
 button_b1.grid(row = 4, column=0,padx=10, pady=10)
-button_b2.grid(row=0,column=0,padx=10,pady=10)
-button_b3.grid(row=1,column=0,padx=10,pady=10)
+button_b2.grid(row=0,column=0,padx=10,pady=5)
+button_b3.grid(row=1,column=0,padx=10,pady=5)
+button_b4.grid(row=5,column=0,padx=10,pady=5)
+button_b5.grid(row=6,column=0,padx=10,pady=5)
+button_b6.grid(row=7,column=0,padx=10,pady=5)
+button_b7.grid(row=8,column=0,padx=10,pady=5)
 entry_W.grid(row = 1, column = 1)
 entry_L.grid(row = 2, column = 1)
 entry_H.grid(row = 3, column = 1)
@@ -350,5 +359,4 @@ def init2(self):
     canvas.get_tk_widget().pack(side=TOP,fill=BOTH,expand=1)
 #############################################################################
 ##############################################################################
-button_b1.bind('<Button-1>',simple3dPlot)
 root.mainloop()
