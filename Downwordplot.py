@@ -89,9 +89,9 @@ def insertMetalPlate():
 
 def insertMetalPlateUnderSea():
 	global finalMat
-	for i in range(1000,1100):
+	for i in range(1000,1200):
 	    for j in range(80,120):
-	        finalMat[i,j] = random.randint(150,200)
+	        finalMat[i,j] = random.randint(5,25)
 def plot2d():
 	global finalMat
 	fig = plt.figure(figsize=(6, 10))
@@ -224,21 +224,26 @@ def getDepths():
 		runningAverage=0
 		runningAverage=0
 		baseDifference=0
-		for x in range(1500,600,-10):
-			for z in range(x,x - 10):
-				runningAverage=(data2[z][y])/(z-x+1) + runningAverage*((z-x)/(z-x+1))
-			if runningAverage > 200 | runningAverage < 20:
+		for x in range(1300,600,-10):
+			for z in range(x - 11,x):
+				runningAverage = data2[z][y] + runningAverage
+			runningAverage = runningAverage/11;
+			if runningAverage > 255 or runningAverage < 30:
 				#print("running average")
 				#print(runningAverage)
 				#print("depth")
 				#print(x)
-				depths[i]=x/133
+				depths[y]=x/133
 				#if depths[i]>7.5:
 				#	depths[i]=7.5
-				if depths[i]<6.5:
-					depths[i]=6.5
-				i=i+1
+				if depths[y]<6.5:
+					depths[y]=6.5
+				
+				#if y > 75 & y < 130 :
+                                #print(depths[i])
+                                
 				break
+		i = i+1
 		
 		#print("running average 2")
 		#print(runningAverage)
@@ -249,7 +254,7 @@ def getDepths():
 		#print("y break")
 		#print(y)
 		#print(" ")
-	#print(depths)
+	print(depths)
 	return depths
 
 def simple2dPlot():
@@ -259,6 +264,7 @@ def simple2dPlot():
 def plot2DwithMetalPlate():
 	generate2DPlot()
 	insertMetalPlate()
+	insertMetalPlateUnderSea()
 	plot2d()
 
 def simple3dPlot():	
@@ -269,6 +275,7 @@ def simple3dPlot():
 def plot3dWithMetalStrip():
 	generate2DPlot()
 	insertMetalPlate()
+	insertMetalPlateUnderSea()
 	interpolate(getDepths())	
 	plot3dByPlotly()
 
