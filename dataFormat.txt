@@ -1,0 +1,20 @@
+BOSS Seatrial (Jan 2017) data with buried object
+
+No. of pings: 192
+Data format:single ping stored in column 
+single ping :49216 samples 
+
+Ping format
+
+Byte number 		Fields 
+1			Header (12345)
+2			Header (Ping number)
+3			Header 
+4-6			Pitch 
+7-9			Roll
+10-16			Latitude
+17-23			Longitude 
+24-29			Time stamp
+30-31			Header (Data validity)
+32-49183		Hydrophone data
+49184			Footer (0)
