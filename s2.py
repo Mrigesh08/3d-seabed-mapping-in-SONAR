@@ -25,6 +25,7 @@ py.offline.init_notebook_mode()
 ###########################################################################################
 
 depths=[0 for x in range(192)]
+#print(len(depths))
 #data2 = [[0 for x in range(192)] for y in range(1536)]
 #for x in range(0,192):
 #	for y in range(0,1536):
@@ -87,6 +88,12 @@ def insertMetalPlate():
 	    for j in range(80,120):
 	        finalMat[i,j] = random.randint(150,200)
 
+def insertMetalPlateUndersea():
+	global finalMat
+	for i in range(1100,1200):
+		for j in range(80,120):
+			finalMat[i,j] = random.randint(75,95)
+
 def plot2d():
 	global finalMat
 	fig = plt.figure(figsize=(6, 10))
@@ -138,10 +145,7 @@ def interpolateAndCreateObject(arr2):
 	n = 20;
 	depthsArr = np.zeros((n,192));
 	for x in range(0,192):
-		#f arr2[x]>7:
 		depthsArr[0,x]=-1*arr2[x]
-		#else:
-		#	depthsArr[0,x]=7
 	for i in range(1,n):
 	    for j in range(0,192):
 	        rand = random.randint(-10,11)
@@ -155,6 +159,53 @@ def interpolateAndCreateObject(arr2):
 	for i in range(10,11):
 		for j in range(10,110):
 			depthsArr[i,j]+=0.25
+
+def interpolateAndDetectUnderwaterObject(arr2):
+	global depthsArr
+	global finalMat
+	interpolate(arr2)
+	depths2=[[-10 for i in range(192)] for j in range(20)]
+	#print(arr2)
+	runningAverage=0
+	for i in range(0,192):
+		x=int(arr2[i]*133)
+		#print("i=%d and x=%d" % (i,x) )
+
+		for j in range (x,1500,10):
+			for k in range(j,j+10):
+				runningAverage=runningAverage+finalMat[k,i]
+			runningAverage=runningAverage/10
+			#print("i=%d j=%d runningAverage=%f" % (i,j,runningAverage))
+			if runningAverage>=75 and runningAverage<=95:
+				# print("Object detected i=%d and runningAverage=%f" %(i,runningAverage))
+				depths[0][i]=-1*j/133
+				break
+			runningAverage=0
+			
+		#print(" ")
+	data = [go.Surface(z=depthsArr),go.Surface(z=depths2)]
+	layout = go.Layout(scene = dict(
+		xaxis = dict(
+			nticks=18, 
+			range = [0,192],
+			),
+		yaxis = dict(
+			nticks=20, 
+			range = [0,20],
+			),
+		zaxis = dict(
+			nticks=10, 
+			range = [-10,10],
+			),
+		),
+	width=1000,
+	margin=dict(
+		r=20, l=10,b=10, t=10
+		)
+	)
+	fig = go.Figure(data=data,layout=layout)
+	py.offline.plot(fig)
+	print("done")
 
 def plot3d():
 	global depthsArr
@@ -214,6 +265,7 @@ def plot3dByPlotly():
 def getDepths():
 	i=0
 	global finalMat
+
 	data2=finalMat
 	for y in range(0,192):
 		runningAverage=0
@@ -245,6 +297,7 @@ def getDepths():
 		#print(y)
 		#print(" ")
 	#print(depths)
+	depths[191]=depths[190]
 	return depths
 
 def simple2dPlot():
@@ -254,6 +307,11 @@ def simple2dPlot():
 def plot2DwithMetalPlate():
 	generate2DPlot()
 	insertMetalPlate()
+	plot2d()
+
+def plot2DwithUnderSeaObject():
+	generate2DPlot()
+	insertMetalPlateUndersea()
 	plot2d()
 
 def simple3dPlot():	
@@ -271,6 +329,11 @@ def plot3dWithObject():
 	generate2DPlot()
 	interpolateAndCreateObject(getDepths())	
 	plot3dByPlotly()
+
+def plot3dWithUnderwaterObject():
+	generate2DPlot()
+	insertMetalPlateUndersea()
+	interpolateAndDetectUnderwaterObject(getDepths())
 
 ########################################################################
 root = Tk()
@@ -318,6 +381,8 @@ button_b4=Button(ctr_right,text="Generate 2D plot with Metal Strip",width=25 , c
 button_b5=Button(ctr_right,text="Generate 3D plot",width=25 , command=simple3dPlot)
 button_b6=Button(ctr_right,text="Generate 3D plot with Metal Strip",width=25 , command=plot3dWithMetalStrip)
 button_b7=Button(ctr_right,text="Generate 3D plot with Object",width=25 , command=plot3dWithObject)
+button_b8=Button(ctr_right,text="Generate 2D plot with Undersea Object",width=30 , command=plot2DwithUnderSeaObject)
+button_b9=Button(ctr_right,text="Generate 3D plot with Undersea Object",width=30 , command=plot3dWithUnderwaterObject)
 entry_W = Entry(ctr_right, background="white")
 entry_L = Entry(ctr_right, background="white")
 entry_H = Entry(ctr_right, background="white")
@@ -339,6 +404,8 @@ button_b4.grid(row=5,column=0,padx=10,pady=5)
 button_b5.grid(row=6,column=0,padx=10,pady=5)
 button_b6.grid(row=7,column=0,padx=10,pady=5)
 button_b7.grid(row=8,column=0,padx=10,pady=5)
+button_b8.grid(row=9,column=0,padx=10,pady=5)
+button_b9.grid(row=10,column=0,padx=10,pady=5)
 entry_W.grid(row = 1, column = 1)
 entry_L.grid(row = 2, column = 1)
 entry_H.grid(row = 3, column = 1)
@@ -357,6 +424,37 @@ def init2(self):
     canvas=FigureCanvasTkAgg(f,master=ctr_mid)
     canvas.show()
     canvas.get_tk_widget().pack(side=TOP,fill=BOTH,expand=1)
+
+def test():
+	#from plotly.graph_objs import Surface
+
+	z1 = [
+	    [8.83,8.89,8.81,8.87,8.9,8.87],
+	    [8.89,8.94,8.85,8.94,8.96,8.92],
+	    [8.84,8.9,8.82,8.92,8.93,8.91],
+	    [8.79,8.85,8.79,8.9,8.94,8.92],
+	    [8.79,8.88,8.81,8.9,8.95,8.92],
+	    [8.8,8.82,8.78,8.91,8.94,8.92],
+	    [8.75,8.78,8.77,8.91,8.95,8.92],
+	    [8.8,8.8,8.77,8.91,8.95,8.94],
+	    [8.74,8.81,8.76,8.93,8.98,8.99],
+	    [8.89,8.99,8.92,9.1,9.13,9.11],
+	    [8.97,8.97,8.91,9.09,9.11,9.11],
+	    [9.04,9.08,9.05,9.25,9.28,9.27],
+	    [9,9.01,9,9.2,9.23,9.2],
+	    [8.99,8.99,8.98,9.18,9.2,9.19],
+	    [8.93,8.97,8.97,9.18,9.2,9.18]
+	]
+
+	z2 = [[zij+1 for zij in zi] for zi in z1]
+	z3 = [[zij-1 for zij in zi] for zi in z1]
+
+	py.offline.plot([
+	    dict(z=z1, type='surface'),
+	    dict(z=z2, showscale=False, opacity=0.9, type='surface'),
+	    dict(z=z3, showscale=False, opacity=0.9, type='surface')],
+	    filename='multiple-surfaces')
+#test()
 #############################################################################
 ##############################################################################
 root.mainloop()
