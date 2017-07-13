@@ -178,11 +178,15 @@ def interpolateAndDetectUnderwaterObject(arr2):
 			#print("i=%d j=%d runningAverage=%f" % (i,j,runningAverage))
 			if runningAverage>=75 and runningAverage<=95:
 				# print("Object detected i=%d and runningAverage=%f" %(i,runningAverage))
-				depths[0][i]=-1*j/133
+				depths2[0][i]=-1*j/133
 				break
 			runningAverage=0
 			
 		#print(" ")
+	for i in range(1,20):
+		depths2[i]=depths2[0]
+
+
 	data = [go.Surface(z=depthsArr),go.Surface(z=depths2)]
 	layout = go.Layout(scene = dict(
 		xaxis = dict(
